@@ -8,7 +8,6 @@ import 'package:flutter_alice/ui/widget/alice_call_error_widget.dart';
 import 'package:flutter_alice/ui/widget/alice_call_overview_widget.dart';
 import 'package:flutter_alice/ui/widget/alice_call_request_widget.dart';
 import 'package:flutter_alice/ui/widget/alice_call_response_widget.dart';
-import 'package:share_plus/share_plus.dart';
 
 class AliceCallDetailsScreen extends StatefulWidget {
   final AliceHttpCall call;
@@ -20,8 +19,7 @@ class AliceCallDetailsScreen extends StatefulWidget {
   _AliceCallDetailsScreenState createState() => _AliceCallDetailsScreenState();
 }
 
-class _AliceCallDetailsScreenState extends State<AliceCallDetailsScreen>
-    with SingleTickerProviderStateMixin {
+class _AliceCallDetailsScreenState extends State<AliceCallDetailsScreen> with SingleTickerProviderStateMixin {
   AliceHttpCall get call => widget.call;
 
   @override
@@ -41,9 +39,8 @@ class _AliceCallDetailsScreenState extends State<AliceCallDetailsScreen>
         initialData: [widget.call],
         builder: (context, callsSnapshot) {
           if (callsSnapshot.hasData) {
-            AliceHttpCall? call = callsSnapshot.data?.firstWhere(
-                (snapshotCall) => snapshotCall.id == widget.call.id,
-                orElse: null);
+            AliceHttpCall? call =
+                callsSnapshot.data?.firstWhere((snapshotCall) => snapshotCall.id == widget.call.id, orElse: null);
             if (call != null) {
               return _buildMainWidget();
             } else {
@@ -61,17 +58,7 @@ class _AliceCallDetailsScreenState extends State<AliceCallDetailsScreen>
     return DefaultTabController(
       length: 4,
       child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: AliceConstants.lightRed,
-          key: Key('share_key'),
-          onPressed: () async {
-            Share.share(await _getSharableResponseString(),
-                subject: 'Request Details');
-            await Clipboard.setData(
-                ClipboardData(text: await _getSharableResponseString()));
-          },
-          child: Icon(Icons.share),
-        ),
+        floatingActionButton: Icon(Icons.share),
         appBar: AppBar(
           bottom: TabBar(
             indicatorColor: AliceConstants.lightRed,
