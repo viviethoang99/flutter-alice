@@ -27,8 +27,7 @@ class AliceSaveHelper {
     stringBuffer.write("Method: ${call.method} \n");
     stringBuffer.write("Endpoint: ${call.endpoint} \n");
     stringBuffer.write("Client: ${call.client} \n");
-    stringBuffer
-        .write("Duration ${AliceConversionHelper.formatTime(call.duration)}\n");
+    stringBuffer.write("Duration ${AliceConversionHelper.formatTime(call.duration)}\n");
     stringBuffer.write("Secured connection: ${call.secure}\n");
     stringBuffer.write("Completed: ${!call.loading} \n");
     stringBuffer.write("--------------------------------------------\n");
@@ -36,12 +35,9 @@ class AliceSaveHelper {
     stringBuffer.write("--------------------------------------------\n");
     stringBuffer.write("Request time: ${call.request!.time}\n");
     stringBuffer.write("Request content type: ${call.request!.contentType}\n");
-    stringBuffer
-        .write("Request cookies: ${_encoder.convert(call.request!.cookies)}\n");
-    stringBuffer
-        .write("Request headers: ${_encoder.convert(call.request!.headers)}\n");
-    stringBuffer.write(
-        "Request size: ${AliceConversionHelper.formatBytes(call.request!.size)}\n");
+    stringBuffer.write("Request cookies: ${_encoder.convert(call.request!.cookies)}\n");
+    stringBuffer.write("Request headers: ${_encoder.convert(call.request!.headers)}\n");
+    stringBuffer.write("Request size: ${AliceConversionHelper.formatBytes(call.request!.size)}\n");
     stringBuffer.write(
         "Request body: ${AliceParser.formatBody(call.request!.body, AliceParser.getContentType(call.request!.headers))}\n");
     stringBuffer.write("--------------------------------------------\n");
@@ -49,10 +45,8 @@ class AliceSaveHelper {
     stringBuffer.write("--------------------------------------------\n");
     stringBuffer.write("Response time: ${call.response!.time}\n");
     stringBuffer.write("Response status: ${call.response!.status}\n");
-    stringBuffer.write(
-        "Response size: ${AliceConversionHelper.formatBytes(call.response!.size)}\n");
-    stringBuffer.write(
-        "Response headers: ${_encoder.convert(call.response!.headers)}\n");
+    stringBuffer.write("Response size: ${AliceConversionHelper.formatBytes(call.response!.size)}\n");
+    stringBuffer.write("Response headers: ${_encoder.convert(call.response!.headers)}\n");
     stringBuffer.write(
         "Response body: ${AliceParser.formatBody(call.response!.body, AliceParser.getContentType(call.response!.headers))}\n");
     if (call.error != null) {
@@ -73,6 +67,33 @@ class AliceSaveHelper {
     stringBuffer.write("\n");
 
     return stringBuffer.toString();
+  }
+
+  static Future<String> getCurl(AliceHttpCall call) async {
+    try {
+      return call.getCurlCommand();
+    } catch (exception) {
+      return "Failed to generate curl command";
+    }
+  }
+
+  static Future<String?> getResponseBody(AliceHttpCall call) async {
+    try {
+      return AliceParser.formatBody(
+        call.response?.body,
+        AliceParser.getContentType(call.response?.headers),
+      );
+    } catch (exception) {
+      return "Failed to generate response body";
+    }
+  }
+
+  static Future<String?> getHeaderRequest(AliceHttpCall call) async {
+    try {
+      return _encoder.convert(_encoder.convert(call.request?.headers));
+    } catch (exception) {
+      return "Failed to generate response headers";
+    }
   }
 
   static Future<String> buildCallLog(AliceHttpCall call) async {

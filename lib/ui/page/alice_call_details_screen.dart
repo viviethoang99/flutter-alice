@@ -63,8 +63,63 @@ class _AliceCallDetailsScreenState extends State<AliceCallDetailsScreen> with Si
           backgroundColor: AliceConstants.lightRed,
           key: Key('share_key'),
           onPressed: () async {
-            Share.share(await _getSharableResponseString(), subject: 'Request Details');
-            await Clipboard.setData(ClipboardData(text: await _getSharableResponseString()));
+            showModalBottomSheet(
+                context: context,
+                builder: (BuildContext context) {
+                  return Container(
+                    child: Column(
+                      children: <Widget>[
+                        SizedBox(
+                          height: 20,
+                        ),
+                        _ItemShared(
+                          title: 'Curl',
+                          onShare: () {
+                            Share.share(call.getCurlCommand(), subject: 'Curl command');
+                          },
+                          onCopy: () {
+                            Clipboard.setData(ClipboardData(text: call.getCurlCommand()));
+                          },
+                        ),
+                        _ItemShared(
+                          title: 'Response body',
+                          onShare: () async {
+                            AliceSaveHelper.getResponseBody(call).then((value) {
+                              Share.share(value!, subject: 'Response body');
+                            });
+                          },
+                          onCopy: () {
+                            AliceSaveHelper.getResponseBody(call).then((value) {
+                              Clipboard.setData(ClipboardData(text: value ?? ''));
+                            });
+                          },
+                        ),
+                        _ItemShared(
+                          title: 'Response headers',
+                          onShare: () async {
+                            AliceSaveHelper.getHeaderRequest(call).then((value) {
+                              Share.share(value!, subject: 'Response headers');
+                            });
+                          },
+                          onCopy: () {
+                            AliceSaveHelper.getHeaderRequest(call).then((value) {
+                              Clipboard.setData(ClipboardData(text: value ?? ''));
+                            });
+                          },
+                        ),
+                        _ItemShared(
+                          title: 'Full log',
+                          onShare: () async {
+                            Share.share(await _getSharableResponseString(), subject: 'Full log');
+                          },
+                          onCopy: () {
+                            Clipboard.setData(ClipboardData(text: call.getCurlCommand()));
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                });
           },
           child: Icon(Icons.share),
         ),
@@ -111,5 +166,46 @@ class _AliceCallDetailsScreenState extends State<AliceCallDetailsScreen> with Si
     widgets.add(AliceCallResponseWidget(widget.call));
     widgets.add(AliceCallErrorWidget(widget.call));
     return widgets;
+  }
+}
+
+class _ItemShared extends StatelessWidget {
+  const _ItemShared({
+    Key? key,
+    required this.title,
+    required this.onShare,
+    required this.onCopy,
+  }) : super(key: key);
+
+  final String title;
+  final Function() onShare;
+  final Function() onCopy;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        side: BorderSide(
+          color: Colors.green.shade300,
+        ),
+        borderRadius: BorderRadius.circular(4.0),
+      ),
+      child: ListTile(
+        title: Text(title),
+        trailing: Wrap(
+          spacing: 0, // space between two icons
+          children: <Widget>[
+            IconButton(
+              icon: Icon(Icons.copy),
+              onPressed: onCopy,
+            ), // icon-1
+            IconButton(
+              icon: Icon(Icons.share),
+              onPressed: onShare,
+            ), //
+          ],
+        ),
+      ),
+    );
   }
 }
