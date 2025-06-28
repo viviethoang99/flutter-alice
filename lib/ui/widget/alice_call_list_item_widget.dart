@@ -63,7 +63,7 @@ class AliceCallListItemWidget extends StatelessWidget {
             style: TextStyle(fontSize: 16, color: textColor),
             maxLines: 1,
           ),
-        )
+        ),
       ],
     );
   }
@@ -88,14 +88,9 @@ class AliceCallListItemWidget extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        Flexible(flex: 1, child: Text(_formatTime(call.request!.time), style: TextStyle(fontSize: 12))),
         Flexible(
-            flex: 1,
-            child: Text(_formatTime(call.request!.time),
-                style: TextStyle(fontSize: 12))),
-        Flexible(
-            flex: 1,
-            child: Text("${AliceConversionHelper.formatTime(call.duration)}",
-                style: TextStyle(fontSize: 12))),
+            flex: 1, child: Text("${AliceConversionHelper.formatTime(call.duration)}", style: TextStyle(fontSize: 12))),
         Flexible(
           flex: 1,
           child: Text(

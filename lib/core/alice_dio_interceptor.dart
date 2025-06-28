@@ -9,12 +9,30 @@ import 'package:flutter_alice/model/alice_http_error.dart';
 import 'package:flutter_alice/model/alice_http_request.dart';
 import 'package:flutter_alice/model/alice_http_response.dart';
 
+dynamic _defaultDecode(dynamic data) => data;
+
 class AliceDioInterceptor extends InterceptorsWrapper {
   /// AliceCore instance
   final AliceCore aliceCore;
 
+  /// Function to decode data on request.
+  final dynamic Function(dynamic data) decodeDataOnRequest;
+
+  /// Default function to decode data on response.
+  final dynamic Function(dynamic data) decodeDataOnResponse;
+
+  /// Function to decode data on error.
+  final dynamic Function(dynamic data)? decodeDataOnError;
+
   /// Creates dio interceptor
-  AliceDioInterceptor(this.aliceCore);
+  AliceDioInterceptor(
+    this.aliceCore, {
+    dynamic Function(dynamic data)? decodeDataOnResponse,
+    dynamic Function(dynamic data)? decodeDataOnRequest,
+    dynamic Function(dynamic data)? decodeDataOnError,
+  })  : decodeDataOnResponse = decodeDataOnResponse ?? _defaultDecode,
+        decodeDataOnRequest = decodeDataOnRequest ?? _defaultDecode,
+        decodeDataOnError = decodeDataOnError ?? _defaultDecode;
 
   /// Handles dio request and creates alice http call based on it
   @override
@@ -59,15 +77,28 @@ class AliceDioInterceptor extends InterceptorsWrapper {
         if (data.files.isNotEmpty == true) {
           List<AliceFormDataFile> files = [];
           data.files.forEach((entry) {
-            files.add(AliceFormDataFile(entry.value.filename!,
-                entry.value.contentType.toString(), entry.value.length));
+            files.add(
+              AliceFormDataFile(
+                entry.value.filename!,
+                entry.value.contentType.toString(),
+                entry.value.length,
+              ),
+            );
           });
 
           request.formDataFiles = files;
         }
       } else {
-        request.size = utf8.encode(data.toString()).length;
-        request.body = data;
+        final decoded = decodeDataOnRequest(data);
+        
+        if (decoded != data) {
+          request.isEncrypted = true;
+        } else {
+          request.isEncrypted = false;
+        }
+
+        request.size = utf8.encode(decoded.toString()).length;
+        request.body = decoded;
       }
     }
 
@@ -96,8 +127,15 @@ class AliceDioInterceptor extends InterceptorsWrapper {
       httpResponse.body = "";
       httpResponse.size = 0;
     } else {
-      httpResponse.body = response.data;
-      httpResponse.size = utf8.encode(response.data.toString()).length;
+      final decoded = decodeDataOnResponse(response.data);
+      if (decoded != response.data) {
+        httpResponse.isDataDecoded = true;
+      } else {
+        httpResponse.isDataDecoded = false;
+      }
+
+      httpResponse.body = decoded;
+      httpResponse.size = utf8.encode(decoded.toString()).length;
     }
 
     httpResponse.time = DateTime.now();
@@ -137,8 +175,16 @@ class AliceDioInterceptor extends InterceptorsWrapper {
         httpResponse.body = "";
         httpResponse.size = 0;
       } else {
-        httpResponse.body = error.response!.data;
-        httpResponse.size = utf8.encode(error.response!.data.toString()).length;
+        final decoded = decodeDataOnError != null
+            ? decodeDataOnError!(error.response!.data)
+            : decodeDataOnResponse(error.response!.data);
+        if (decoded != error.response!.data) {
+          httpResponse.isDataDecoded = true;
+        } else {
+          httpResponse.isDataDecoded = false;
+        }
+        httpResponse.body = decoded;
+        httpResponse.size = utf8.encode(decoded.toString()).length;
       }
       Map<String, String> headers = Map();
       if (error.response?.headers != null) {
@@ -147,8 +193,7 @@ class AliceDioInterceptor extends InterceptorsWrapper {
         });
       }
       httpResponse.headers = headers;
-      aliceCore.addResponse(
-          httpResponse, error.response!.requestOptions.hashCode);
+      aliceCore.addResponse(httpResponse, error.response!.requestOptions.hashCode);
     }
     handler.next(error);
   }

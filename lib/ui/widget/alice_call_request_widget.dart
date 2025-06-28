@@ -13,17 +13,23 @@ class AliceCallRequestWidget extends StatefulWidget {
   }
 }
 
-class _AliceCallRequestWidget
-    extends AliceBaseCallDetailsWidgetState<AliceCallRequestWidget> {
+class _AliceCallRequestWidget extends AliceBaseCallDetailsWidgetState<AliceCallRequestWidget> {
   AliceHttpCall get _call => widget.call;
 
   @override
   Widget build(BuildContext context) {
     List<Widget> rows = [];
+    rows.add(Text(
+      "Mã hoá: ${_call.response?.isDataDecoded == true ? "Có mã hoá" : "Không mã hoá"}",
+      style: TextStyle(
+        fontWeight: FontWeight.bold,
+        color: Colors.green,
+        fontSize: 20,
+      ),
+    ));
     rows.add(getListRow("Started:", _call.request!.time.toString()));
     rows.add(getListRow("Bytes sent:", formatBytes(_call.request!.size)));
-    rows.add(
-        getListRow("Content type:", getContentType(_call.request!.headers)!));
+    rows.add(getListRow("Content type:", getContentType(_call.request!.headers)!));
 
     var body = _call.request!.body;
     String? bodyContent = "Body is empty";
@@ -45,8 +51,7 @@ class _AliceCallRequestWidget
       rows.add(getListRow("Form data files: ", ""));
       formDataFiles!.forEach(
         (field) {
-          rows.add(getListRow("   • ${field.fileName}:",
-              "${field.contentType} / ${field.length} B"));
+          rows.add(getListRow("   • ${field.fileName}:", "${field.contentType} / ${field.length} B"));
         },
       );
     }

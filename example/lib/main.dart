@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,17 @@ class _MyAppState extends State<MyApp> {
       darkTheme: true,
     );
     _dio = Dio(BaseOptions(followRedirects: false));
-    _dio.interceptors.add(_alice.getDioInterceptor());
+    _dio.interceptors.add(_alice.getDioInterceptor(
+      decodeDataOnResponse: (data) {
+        // Viết random logic giải mã
+        final random = Random();
+        if (random.nextBool()) {
+          return '{"message": "Decoded data"}';
+        } else {
+          return data;
+        }
+      },
+    ));
     _httpClient = HttpClient();
 
     super.initState();

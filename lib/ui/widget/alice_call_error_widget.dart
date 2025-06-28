@@ -13,14 +13,21 @@ class AliceCallErrorWidget extends StatefulWidget {
   }
 }
 
-class _AliceCallErrorWidgetState
-    extends AliceBaseCallDetailsWidgetState<AliceCallErrorWidget> {
+class _AliceCallErrorWidgetState extends AliceBaseCallDetailsWidgetState<AliceCallErrorWidget> {
   AliceHttpCall get _call => widget.call;
 
   @override
   Widget build(BuildContext context) {
     if (_call.error != null) {
       List<Widget> rows = [];
+      rows.add(Text(
+        "Mã hoá: ${_call.response?.isDataDecoded == true ? "Có mã hoá" : "Không mã hoá"}",
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Colors.green,
+          fontSize: 20,
+        ),
+      ));
       var error = _call.error!.error;
       var errorText = "Error is empty";
       if (error != null) {

@@ -13,4 +13,5 @@ class AliceHttpRequest {
   Map<String, dynamic> queryParameters = Map();
   List<AliceFormDataFile>? formDataFiles;
   List<AliceFormDataField>? formDataFields;
+  bool isEncrypted = false;
 }

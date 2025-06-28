@@ -40,8 +40,10 @@ class _AliceCallDetailsScreenState extends State<AliceCallDetailsScreen> with Si
         initialData: [widget.call],
         builder: (context, callsSnapshot) {
           if (callsSnapshot.hasData) {
-            AliceHttpCall? call =
-                callsSnapshot.data?.firstWhere((snapshotCall) => snapshotCall.id == widget.call.id, orElse: null);
+            AliceHttpCall? call = callsSnapshot.data?.firstWhere(
+              (snapshotCall) => snapshotCall.id == widget.call.id,
+              orElse: null,
+            );
             if (call != null) {
               return _buildMainWidget();
             } else {
@@ -150,12 +152,7 @@ class _AliceCallDetailsScreenState extends State<AliceCallDetailsScreen> with Si
     widgets.add(Tab(icon: Icon(Icons.info_outline), text: "Overview"));
     widgets.add(Tab(icon: Icon(Icons.arrow_upward), text: "Request"));
     widgets.add(Tab(icon: Icon(Icons.arrow_downward), text: "Response"));
-    widgets.add(
-      Tab(
-        icon: Icon(Icons.warning),
-        text: "Error",
-      ),
-    );
+    widgets.add(Tab(icon: Icon(Icons.warning), text: "Error"));
     return widgets;
   }
 

@@ -13,8 +13,7 @@ class AliceCallResponseWidget extends StatefulWidget {
   }
 }
 
-class _AliceCallResponseWidgetState
-    extends AliceBaseCallDetailsWidgetState<AliceCallResponseWidget> {
+class _AliceCallResponseWidgetState extends AliceBaseCallDetailsWidgetState<AliceCallResponseWidget> {
   static const _imageContentType = "image";
   static const _videoContentType = "video";
   static const _jsonContentType = "json";
@@ -31,22 +30,29 @@ class _AliceCallResponseWidgetState
   Widget build(BuildContext context) {
     List<Widget> rows = [];
     if (!_call.loading) {
+      rows.add(Text(
+        "Mã hoá: ${_call.response?.isDataDecoded == true ? "Có mã hoá" : "Không mã hoá"}",
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Colors.green,
+          fontSize: 20,
+        ),
+      ));
       rows.addAll(_buildGeneralDataRows());
       rows.addAll(_buildHeadersRows());
       rows.addAll(_buildBodyRows());
 
       return Container(
         padding: const EdgeInsets.all(6),
-        child: ListView(children: rows),
+        child: ListView(
+          children: rows,
+        ),
       );
     } else {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            new CircularProgressIndicator(),
-            Text("Awaiting response...")
-          ],
+          children: [new CircularProgressIndicator(), Text("Awaiting response...")],
         ),
       );
     }
@@ -126,14 +132,12 @@ class _AliceCallResponseWidgetState
             _call.uri,
             fit: BoxFit.fill,
             headers: _buildRequestHeaders(),
-            loadingBuilder: (BuildContext context, Widget child,
-                ImageChunkEvent? loadingProgress) {
+            loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
               if (loadingProgress == null) return child;
               return Center(
                 child: CircularProgressIndicator(
                   value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded /
-                          loadingProgress.expectedTotalBytes!
+                      ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
                       : null,
                 ),
               );
@@ -151,8 +155,7 @@ class _AliceCallResponseWidgetState
     if (_showLargeBody) {
       return _buildTextBodyRows();
     } else {
-      rows.add(getListRow("Body:",
-          "Too large to show (${_call.response!.body.toString().length} Bytes)"));
+      rows.add(getListRow("Body:", "Too large to show (${_call.response!.body.toString().length} Bytes)"));
       rows.add(const SizedBox(height: 8));
       rows.add(
         ElevatedButton(
@@ -173,8 +176,7 @@ class _AliceCallResponseWidgetState
   List<Widget> _buildTextBodyRows() {
     List<Widget> rows = [];
     var headers = _call.response!.headers;
-    var bodyContent =
-        formatBody(_call.response!.body, getContentType(headers))!;
+    var bodyContent = formatBody(_call.response!.body, getContentType(headers))!;
     rows.add(getListRow("Body:", bodyContent));
     return rows;
   }
@@ -185,8 +187,7 @@ class _AliceCallResponseWidgetState
     var contentType = getContentType(headers) ?? "<unknown>";
 
     if (_showUnsupportedBody) {
-      var bodyContent =
-          formatBody(_call.response!.body, getContentType(headers))!;
+      var bodyContent = formatBody(_call.response!.body, getContentType(headers))!;
       rows.add(getListRow("Body:", bodyContent));
     } else {
       rows.add(getListRow(
@@ -224,20 +225,15 @@ class _AliceCallResponseWidgetState
   }
 
   bool _isImageResponse() {
-    return _getContentTypeOfResponse()!
-        .toLowerCase()
-        .contains(_imageContentType);
+    return _getContentTypeOfResponse()!.toLowerCase().contains(_imageContentType);
   }
 
   bool _isVideoResponse() {
-    return _getContentTypeOfResponse()!
-        .toLowerCase()
-        .contains(_videoContentType);
+    return _getContentTypeOfResponse()!.toLowerCase().contains(_videoContentType);
   }
 
   bool _isTextResponse() {
-    String responseContentTypeLowerCase =
-        _getContentTypeOfResponse()!.toLowerCase();
+    String responseContentTypeLowerCase = _getContentTypeOfResponse()!.toLowerCase();
 
     return responseContentTypeLowerCase.contains(_jsonContentType) ||
         responseContentTypeLowerCase.contains(_xmlContentType) ||
@@ -249,7 +245,6 @@ class _AliceCallResponseWidgetState
   }
 
   bool _isLargeResponseBody() {
-    return _call.response!.body != null &&
-        _call.response!.body.toString().length > _kLargeOutputSize;
+    return _call.response!.body != null && _call.response!.body.toString().length > _kLargeOutputSize;
   }
 }

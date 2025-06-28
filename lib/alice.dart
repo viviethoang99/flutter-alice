@@ -59,8 +59,17 @@ class Alice {
   }
 
   /// Get Dio interceptor which should be applied to Dio instance.
-  AliceDioInterceptor getDioInterceptor() {
-    return AliceDioInterceptor(_aliceCore);
+  AliceDioInterceptor getDioInterceptor({
+    dynamic Function(dynamic data)? decodeDataOnResponse,
+    dynamic Function(dynamic data)? decodeDataOnRequest,
+    dynamic Function(dynamic data)? decodeDataOnError,
+  }) {
+    return AliceDioInterceptor(
+      _aliceCore,
+      decodeDataOnResponse: decodeDataOnResponse,
+      decodeDataOnRequest: decodeDataOnRequest,
+      decodeDataOnError: decodeDataOnError,
+    );
   }
 
   /// Handle request from HttpClient
@@ -69,9 +78,7 @@ class Alice {
   }
 
   /// Handle response from HttpClient
-  void onHttpClientResponse(
-      HttpClientResponse response, HttpClientRequest request,
-      {dynamic body}) {
+  void onHttpClientResponse(HttpClientResponse response, HttpClientRequest request, {dynamic body}) {
     _httpClientAdapter.onResponse(response, request, body: body);
   }
 
