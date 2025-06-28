@@ -1,9 +1,7 @@
 import 'dart:io';
 
-import 'package:chopper/chopper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_alice/core/alice_chopper_response_interceptor.dart';
 import 'package:flutter_alice/core/alice_core.dart';
 import 'package:flutter_alice/core/alice_dio_interceptor.dart';
 import 'package:flutter_alice/core/alice_http_adapter.dart';
@@ -86,11 +84,6 @@ class Alice {
   /// page where all listened http calls can be viewed.
   void showInspector() {
     _aliceCore.navigateToCallListScreen();
-  }
-
-  /// Get chopper interceptor. This should be added to Chopper instance.
-  List<ResponseInterceptor> getChopperInterceptor() {
-    return [AliceChopperInterceptor(_aliceCore)];
   }
 
   /// Handle generic http call. Can be used to any http client.R
